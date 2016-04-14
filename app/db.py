@@ -6,7 +6,7 @@ from app import config
 
 
 engine = create_engine(config.SQLALCHEMY_DATABASE_URI, convert_unicode=True)
-db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+db_session = scoped_session(sessionmaker(autocommit=True, autoflush=False, bind=engine))
 Base = declarative_base()
 Base.query = db_session.query_property()
 
@@ -17,5 +17,4 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
     if models.User.query.filter(models.User.username == "root").first() is None:
-        root = models.User(username="root", password=123, full_rights=True)
-        root.create()
+        models.User(username="root", password=123, full_rights=True).save()

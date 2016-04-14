@@ -19,16 +19,17 @@ class User(Base):
         self.password = self._get_password_hash(password)
         self.full_rights = full_rights
 
-    def create(self):
-        db_session.add(self)
-        db_session.commit()
-
     def remove(self):
         db_session.delete(self)
-        db_session.commit()
+        db_session.flush()
 
     def save(self):
-        db_session.commit()
+        if self.id is None:
+            db_session.add(self)
+        db_session.flush()
+
+    def set_password(self, password):
+        self.password = self._get_password_hash(password)
 
     @classmethod
     def get(cls, pk):

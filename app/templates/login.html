@@ -1,11 +1,20 @@
-<!DOCTYPE html>
-<html>
-    <body>
-        <form action="" method="POST">
-            <input type="text" name="username" placeholder="Username"/>
-            <input type="password" name="password" placeholder="Password"/>
+{% extends 'layout.html' %}
 
-            <input type="submit" value="Login"/>
+{% block title %}{{ super() }} - Login{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename="login.css") }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form class="form-horizontal form-signin" action="" method="POST">
+            <label for="username" class="sr-only">Username</label>
+            <input id="username" class="form-control" type="text" name="username" placeholder="Username" value=""/>
+            <label for="password" class="sr-only">Password</label>
+            <input id="password" class="form-control" type="password" name="password" placeholder="Password"/>
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
         </form>
-    </body>
-</html>
+    </div>
+{% endblock %}

@@ -5,9 +5,7 @@ from flask import g, request, redirect, url_for
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        try:
-            _ = g.current_user
-        except AttributeError:
+        if 'current_user' not in g:
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -16,10 +14,7 @@ def login_required(f):
 def has_rights(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        try:
-            current_user = g.current_user
-        except AttributeError:
-            current_user = None
+        current_user = g.current_user if 'current_user' in g else None
 
         if current_user and current_user.full_rights:
             return f(*args, **kwargs)

@@ -1,41 +1,106 @@
-<!DOCTYPE html>
-<html>
-    <body>
-        <a href="{{ url_for('user_edit') }}">Create</a>
+{% extends 'layout.html' %}
 
-        <table>
+{% block content %}
+    <table class="table table-striped table-hover">
+        <thead>
             <tr>
                 <th>Id</th>
                 <th>Username</th>
                 <th>Rights</th>
-                <th>Remove</th>
+                {% if current_user.full_rights %}
+                    <th>Remove</th>
+                {% endif %}
             </tr>
+        </thead>
+        <tbody>
             {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td>
+                <tr id="user_{{ user.id }}">
+                    <th>{{ user.id }}</th>
                     <td>
-                        {% if current_user.id != user.id %}
-                            <a href="{{ url_for('user_edit', user_id=user.id) }}">{{ user.username }}</a>
+                        {% if current_user.full_rights %}
+                            <a href="#" onclick="open_modal({{ user.id }})">{{ user.username }}</a>
                         {% else %}
                             {{ user.username }}
                         {% endif %}
                     </td>
                     <td>
-                        {% if user.full_rights %}
-                            Full rights
-                        {% else %}
-                            Read only
-                        {% endif %}
+                        {% if user.full_rights %}Full{% else %}Read only{% endif %}
                     </td>
-                    <td>
-                        {% if current_user.id != user.id %}
-                            <form action="{{ url_for('user_remove', user_id=user.id) }}" method="POST">
-                                <input type="submit" value="Remove"/>
-                            </form>
-                        {% endif %}
-                    </td>
+                    {% if current_user.full_rights %}
+                        <td>
+                            <button data-href="{{ url_for("user", user_id=user.id) }}" type="submit" class="btn btn-default remove-button" onclick="remove_line({{ user.id }})">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </button>
+                        </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
-        </table>
-    </body>
-</html>
+            <tr id="user_{user_id}" class="hidden template_row">
+                <th>{user_id}</th>
+                <td>
+                    {% if current_user.full_rights %}
+                        <a href="#" onclick="open_modal({user_id})">{username}</a>
+                    {% else %}
+                        {username}
+                    {% endif %}
+                </td>
+                <td>{full_rights}</td>
+                {% if current_user.full_rights %}
+                    <td>
+                        <button type="submit" class="btn btn-default remove-button" onclick="remove_line({user_id})">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                {% endif %}
+            </tr>
+        </tbody>
+    </table>
+
+    {% if current_user.full_rights %}
+        <p class="text-center">
+            <button id="create_button" class="btn btn-primary">New user</button>
+        </p>
+
+        <div id="create_or_edit_modal" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                            <input type="hidden" name="id" value=""/>
+                            <div class="form-group">
+                                <label for="username" class="col-sm-2 control-label">Username</label>
+                                <div class="col-sm-10">
+                                    <input id="username" class="form-control" type="text" name="username" placeholder="Username" value=""/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="col-sm-2 control-label">Password</label>
+                                <div class="col-sm-10">
+                                    <input id="password" class="form-control" type="password" name="password" placeholder="Password"/>
+                                </div>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="full_rights" />Full rights
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block js %}
+    <script src="{{ url_for('static', filename='list.js') }}"></script>
+{% endblock %}
