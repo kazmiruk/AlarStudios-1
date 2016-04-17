@@ -26,8 +26,12 @@ var open_modal = function(id) {
 };
 
 var remove_line = function(id) {
-    jQuery.ajax({url: '/api/user/' + id, method: 'DELETE'}).done(function() {
-        jQuery('#user_' + id).remove();
+    jQuery.ajax({url: '/api/user/' + id, method: 'DELETE'}).done(function(data) {
+        if (data.reload) {
+            window.location = "/";
+        } else {
+            jQuery('#user_' + id).remove();
+        }
     });
 };
 
@@ -89,23 +93,27 @@ jQuery(document).ready(function() {
                     username: username, password: password, full_rights: full_rights
                 }
             }).done(function (data) {
-                if (id) {
-                    var jel = jQuery('#user_' + id);
-
-                    jel.find('td:nth-child(2) > a').html(escape(data.user.username));
-                    if (data.user.full_rights) {
-                        jel.find('td:nth-child(3) > a').html("Full");
-                    } else {
-                        jel.find('td:nth-child(3) > a').html("Read only");
-                    }
+                if (data.reload) {
+                    window.location = "/";
                 } else {
-                    jQuery('tbody').append('<tr id="user_' + data.user.id + '">' +
-                        jQuery('.template_row').html().replace(new RegExp('{user_id}', 'g'), data.user.id)
-                            .replace('{username}', escape(data.user.username))
-                            .replace('{full_rights}', data.user.full_rights ? "Full" : "Read only") + '</tr>');
-                }
+                    if (id) {
+                        var jel = jQuery('#user_' + id);
 
-                jcreate_and_edit_modal.hide();
+                        jel.find('td:nth-child(2) > a').html(escape(data.user.username));
+                        if (data.user.full_rights) {
+                            jel.find('td:nth-child(3) > a').html("Full");
+                        } else {
+                            jel.find('td:nth-child(3) > a').html("Read only");
+                        }
+                    } else {
+                        jQuery('tbody').append('<tr id="user_' + data.user.id + '">' +
+                            jQuery('.template_row').html().replace(new RegExp('{user_id}', 'g'), data.user.id)
+                                .replace('{username}', escape(data.user.username))
+                                .replace('{full_rights}', data.user.full_rights ? "Full" : "Read only") + '</tr>');
+                    }
+
+                    jcreate_and_edit_modal.hide();
+                }
             });
         }
     });

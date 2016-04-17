@@ -7,11 +7,11 @@ from app.db import db_session, Base
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "task_user"
 
     id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True)
-    password = Column(String(32))
+    password = Column(String(64))
     full_rights = Column(Boolean, default=False)
 
     def __init__(self, username, password, full_rights=False):
